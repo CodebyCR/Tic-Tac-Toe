@@ -15,7 +15,7 @@ class Player {
     
 private:
     int m_winCount;
-
+    
 public:
     // Member / Attribute
     string m_playerName;
@@ -33,8 +33,8 @@ public:
         this->m_winCount = 0;
     }
     
-    //  Destuktor 
-    //~Player();
+    //  Destuktor
+    ~Player(){};
     
     //  Klassen funktionen
     void addWin()

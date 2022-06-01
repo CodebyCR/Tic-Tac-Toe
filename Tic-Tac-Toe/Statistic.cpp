@@ -13,6 +13,9 @@
 using std::string;
 namespace fs = std::__fs::filesystem;
 
+
+//TODO: create and modify statistics.
+
 /*
  read the file and return the input of the file.
  */

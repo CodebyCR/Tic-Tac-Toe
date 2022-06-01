@@ -122,7 +122,7 @@ void showMatrixValues(mat3x3& matrix){
  * Generic function to find if an element of any type exists in list
  */
 template <typename T>
-bool contains(std::vector<T> & vectorOfElements, const T & element)
+bool contains(std::vector<T> &vectorOfElements, const T & element)
 {
     //https://thispointer.com/c-list-find-contains-how-to-search-an-element-in-stdlist/
     // Find the iterator if element in list
@@ -145,6 +145,7 @@ void printField(mat3x3 matrix)
                 cout << " |";
             }
         }
+        
         if (i != 2) {
             cout << "\n\t-----------\n";
         }
@@ -200,6 +201,11 @@ char hasWon(mat3x3 matrix)
 }
 
 int main(int argc, char** argv) {
+    
+    /* using main Parameter for load statistic.txt,
+    * if it exists.
+    */
+    
     
     // Player 1 Attribut belegung
     cout << "Player 1 gib deinen Namen ein.\n";
