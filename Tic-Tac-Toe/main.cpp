@@ -4,58 +4,59 @@
 //
 //  Created by Christoph Rohde on 28.09.21.
 //
-//  Version 1.0.4
+//  Version 1.0.5
 
-#include <stdio.h>
+
 #include <iostream>
 #include "Player.cpp"
 #include <vector>
 
-using std::cout;
-using std::cin;
-using std::vector;
-using std::string;
+
+
+
 using mat3x3 = char[3][3];
-// Create a list Iterator
-vector <char> choiceList;
-vector<string>::iterator it;
+std::vector<char> choiceList;
+
 
 bool win = false;
 bool playAgain;
 
-int round = 0;
+int raw_round = 0;
+int &round = raw_round;
 
 Player player1;
 Player player2;
 
 
-/*
- gibt den aktuellen Spieler zurück
- */
-Player getCurrentPlayer()
-{
+/**
+ * return the current player.
+ **/
+static auto getCurrentPlayer(int round) -> Player {
+
     if (round % 2) {
         return player1;
     }
     return player2;
 }
 
+
 /*
  Print the interim Result.
  */
-void interimResult(Player currentPlayer){
-    cout << "\n --------------------------------------- \n";
-    cout << "|\t Player 1 (" << player1.m_symbol << ")\t|\t Player 2 (" <<  player2.m_symbol << ")\t|\n";
-    cout << "|\t\t " << player1.m_playerName << "\t\t|\t\t" <<  player2.m_playerName << "\t\t|\n";
-    cout << "|\t\tRunde: " << round << "\t|\t" << currentPlayer.m_playerName << " ist dran.\t|\n";
-    cout << " --------------------------------------- \n\n";
+void interimResult( Player &currentPlayer) {
+
+    std::cout
+    << "\n --------------------------------------- \n"
+    << "|\t Player 1 (" << player1.m_symbol << ")\t|\t Player 2 (" <<  player2.m_symbol << ")\t|\n"
+    << "|\t\t " << player1.m_playerName << "\t\t|\t\t" <<  player2.m_playerName << "\t\t|\n"
+    << "|\t\tRound: " << round << "\t|\t" << currentPlayer.m_playerName << "'s turn.\t|\n"
+    << " --------------------------------------- \n\n";
 }
 
-/*
- Aktualiesiert die Matrix und gibt sie zurück.
- */
-mat3x3& updateMatrix( char sector, Player currentPlayer, mat3x3& matrix)
-{
+/**
+ * update the Matrix.
+ **/
+void updateMatrix( char sector, Player &currentPlayer, mat3x3 &matrix) {
     switch (sector) {
         case '1':
             matrix [0][0] = currentPlayer.m_symbol;
@@ -89,19 +90,17 @@ mat3x3& updateMatrix( char sector, Player currentPlayer, mat3x3& matrix)
             
             
         default:
-            cout << "Ungültige Eingabe.\n";
+            std::cout << "Invalid input.\n";
             //            round-1?
             break;
-            
     }
-    return matrix;
 }
 
 /*
- Shows the matrix values for debuging
+ Shows the matrix values for debugging
  */
-void showMatrixValues(mat3x3& matrix){
-    cout <<
+void showMatrixValues(mat3x3 &matrix) {
+    std::cout <<
     "\nLine 1"<<
     "\nmatrix[0][0]: " << matrix[0][0]<<
     "\nmatrix[0][1]: " << matrix[0][1]<<
@@ -122,43 +121,38 @@ void showMatrixValues(mat3x3& matrix){
  * Generic function to find if an element of any type exists in list
  */
 template <typename T>
-bool contains(std::vector<T> &vectorOfElements, const T & element)
-{
-    //https://thispointer.com/c-list-find-contains-how-to-search-an-element-in-stdlist/
-    // Find the iterator if element in list
+bool contains(std::vector<T> &vectorOfElements, const T &element) {
     auto it = std::find(vectorOfElements.begin(), vectorOfElements.end(), element);
-    //return if iterator points to end or not. It points to end then it means element
-    // does not exists in list
     return it != vectorOfElements.end();
 }
 
-/*
- Zeichnet das tic-tac-toe Feld
- */
-void printField(mat3x3 matrix)
+/**
+ * Print the Tic-Tac-Toe field.
+ **/
+void printField(mat3x3 &matrix)
 {
     for (int i = 0; i < 3; i++) {
-        cout << "\t";
+        std::cout << "\t";
         for (int j = 0; j < 3; j++) {
             printf(" %c",  matrix[i][j] );
             if (j != 2) {
-                cout << " |";
+                std::cout << " |";
             }
         }
         
         if (i != 2) {
-            cout << "\n\t-----------\n";
+            std::cout << "\n\t-----------\n";
         }
     }
     printf("\n\n");
 }
 
-/*
- Prüft ob jemand gewonnen hat.
- */
-char hasWon(mat3x3 matrix)
+/**
+ * Checked if someone has won.
+ **/
+char hasWon(mat3x3 &matrix)
 {
-    //Hoizontal
+    // Horizontal
     if (matrix[0][0] == matrix[0][1] && matrix[0][1] == matrix[0][2])
     {
         return matrix[0][0];
@@ -172,7 +166,7 @@ char hasWon(mat3x3 matrix)
         return matrix[2][0];
     }
     
-    //Vertikal
+    // Vertical
     if (matrix[0][0] == matrix[1][0] && matrix[1][0] == matrix[2][0])
     {
         return matrix[0][0];
@@ -200,121 +194,116 @@ char hasWon(mat3x3 matrix)
     return '0';
 }
 
-int main(int argc, char** argv) {
+int main() {
+
+    /*
+     * using main Parameter for load statistic.txt,
+     * if it exists.
+     */
     
-    /* using main Parameter for load statistic.txt,
-    * if it exists.
-    */
     
+    // set Player 1 Attribute
+    std::cout << "Player 1, please enter your name.\n";
+    std::cin >> player1.m_playerName;
+
+    std::cout << "\n" << player1.m_playerName << " choose your symbol.\n";
     
-    // Player 1 Attribut belegung
-    cout << "Player 1 gib deinen Namen ein.\n";
-    cin >> player1.m_playerName;
-    
-    cout << "\n" << player1.m_playerName << " gib dein Symbol ein.\n";
-    
-    while (player1.m_symbol != 'x' && player1.m_symbol != 'o') {
-        cout << "Bitte wähle 'x' oder 'o'.\n";
-        cin >> player1.m_symbol;
+    while ( !(player1.m_symbol == 'x' || player1.m_symbol == 'o') ) {
+        std::cout << "Please choose 'x' or 'o'.\n";
+        std::cin >> player1.m_symbol;
     }
     
     
-    // Player 2 Attribut belegung
-    cout << "Player 2 gib deinen Namen ein.\n";
-    cin >> player2.m_playerName;
+    // set Player 2 Attribute
+    std::cout << "Player 2, please enter your name.\n";
+    std::cin >> player2.m_playerName;
     
-    if(player1.m_symbol == 'x'){
+    if(player1.m_symbol == 'x') {
         player2.m_symbol = 'o';
+
     } else{
         player2.m_symbol = 'x';
     }
     
     
-    //    Spielbeginn
+    // Start the game
     do{
-        //Initalisiere Matrix
+        // initialise the Matrix
         mat3x3 tttMatrix = {
             {'1','2','3'},
             {'4','5','6'},
             {'7','8','9'}};
         
         
-        while (round < 9 && win == false) {
+        while (round < 9 && !win) {
             ++round;
             
-            //TODO: add Clean Consol methode
-            //        cleanScreen();
-            //        system("clear");
-            system("clear");
-            //        system("cls"); for windows
+            // TODO: add Clean Console methode
+            // cleanScreen();
+            // system("clear");
+
+            // system("cls"); for windows
             
-            Player currentPlayer = getCurrentPlayer();
+            Player currentPlayer = getCurrentPlayer(round);
             
-            interimResult(currentPlayer);   // Zwischenstand
-            printField(tttMatrix);          // Print matchfield
+            interimResult(currentPlayer);
+            printField(tttMatrix);
             
             char choice;
-            cout << "Gib die Nummer ein, wo dein Symbol plaziert werden soll.\n";
-            cin >>choice;
+            std::cout << "Enter the number, where your symbol should be placed.\n";
+            std::cin >>choice;
             
             try {
-                if( contains(choiceList, choice) )
-                {
-                    cout << "\n\tSchon belegt.\n";
+                if( contains(choiceList, choice) ) {
+                    std::cout << "\n\tCell occupied.\n";
                     round --;
-                }
-                else{
+                } else {
                     choiceList.push_back(choice);
                     updateMatrix( choice, currentPlayer, tttMatrix);
                 }
                 
                 if(round >= 5){
                     if(currentPlayer.m_symbol == hasWon(tttMatrix)){
-                        cout <<
-                        "\n\n ----------------------------------- \n"<<
-                        "|\t\t" <<currentPlayer.m_playerName << " hat Gewonnen!!!\t\t|"<<
-                        "\n ----------------------------------- \n\n";
+                        std::cout
+                                << "\n\n ----------------------------------- \n"
+                                << "|\t\t" <<currentPlayer.m_playerName << " wins!!!\t\t|"
+                                << "\n ----------------------------------- \n\n";
                         currentPlayer.addWin();
-                        cout << "win counter_1: " << currentPlayer.getWinCount(); //TODO:FIX
                         win = true;
+
                     }else if (round == 9){
-                        cout <<
-                        "\n\n ----------------------------------- \n"<<
-                        "|\t\t\tUnendschieden\t\t\t|"<<
-                        "\n ----------------------------------- \n\n";
+                        std::cout
+                                << "\n\n ----------------------------------- \n"
+                                << "|\t\t\tundecided\t\t\t|"
+                                << "\n ----------------------------------- \n\n";
                     }
                 }
-            } catch (std::exception e) {
-                cout <<"error 0.1";
+            } catch (std::exception &exception) {
+                std::cout << "error 0.1\t" << exception.what();
             }
             currentPlayer.addWin();
-            cout << "\nwin counter_2: " << currentPlayer.getWinCount(); //TODO:FIX
-            cout << "\nwin counter_2.1: " << player1.getWinCount(); //TODO:FIX
-            cout << "\nwin counter_2.2: " << player2.getWinCount(); //TODO:FIX
         }
-        cout << "\nwin counter_3.1: " << player1.getWinCount(); //TODO:FIX
-        cout << "\nwin counter_3.2: " << player2.getWinCount(); //TODO:FIX
-        
-        cout << "\nMöchtet ihr noch eine Runde spielen? [ ja | nein ]\n";
+
+
+        std::cout << "\nDo you want to play a next round? [ yes | no ]\n";
         string nextRound;
-        cin >> nextRound;
-        
-        if(nextRound == "ja" || nextRound == "Ja" || nextRound == "JA"){
+        std::cin >> nextRound;
+
+
+        std::vector<std::string> yes = {"ja", "j", "y", "yes", "Ja", "JA", "J", "Y", "Yes", "YES"};
+        if(contains(yes, nextRound)){
             playAgain = true;
             round = 0;
             win = false;
             choiceList.clear();
+
         } else{
             playAgain = false;
             //TODO: Methode zur Statistik einsicht
             //TODO: methode zum player wechsel
         }
         
-    }while(playAgain);
-    
-    cout<< player1.m_playerName << " hat " << player1.getWinCount() << " mal Gewonnen.\n";
-    cout<< player2.m_playerName << " hat " << player2.getWinCount() << " mal Gewonnen.\n";
+    } while(playAgain);
     
     return 0;
-    
 }
